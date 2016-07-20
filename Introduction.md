@@ -27,8 +27,8 @@ SOA的数据横向扩展机制是分区法。当数据大小和负载增长出�
 <!---The stateless N-tier model delegates the partitioning problem to the storage layer. It often requires caching in the stateless layer to get acceptable performance, adding complexity and introducing cache consistency issues. --->
 无状态的N层模型在存储层解决分区问题。它经常需要添加缓存层来得到可接受的性能，增加了复杂性并且引入了缓存一致性问题。
 
-<!---### Actors--->
 ### Actors 
+<!---### Actors--->
 
 <!---The actor model supports fine-grain individual objects—actors—that are isolated from each other and light-weight enough to allow modeling of an individual entity as an actor. They communicate via asynchronous message passing, which enables direct communications between actors.--->
 Actor模型支持细粒度的独立的对象——actor，actor各自独立并且足够轻量，支持将独立的entity建模成一个actor。他们之间可以通过异步消息传递直接进行通信。
@@ -40,8 +40,8 @@ Actor模型支持细粒度的独立的对象——actor，actor各自独立并�
 <!---For the last decade, Erlang has been the most popular implementation of the traditional actor model. Facing the above-mentioned challenges of SOA, the industry started rediscovering the actor model, which stimulated renewed interest in Erlang and creation of new Erlang-like solutions: Scala actors, Akka, DCell.--->
 过去的十年，Erlang是最流行的传统actor模型的实现。面对上面提到的SOA的挑战，业界开始重新探索actor模型，重新激起了人们对Erlang和类Erlang解决方案（Scala、Akka、DCell）的兴趣。
 
-<!---### Virtual Actors--->
 ### 虚拟Actors
+<!---### Virtual Actors--->
 
 <!---Orleans is an implementation of an improved actor model that borrows heavily from Erlang and distributed objects systems, adds static typing, message indirection and actor virtualization, exposing them in an integrated programming model. Whereas Erlang is a pure functional language with its own custom VM, the Orleans programming model directly leverages .NET and its object-oriented capabilities. It provides a framework that makes development of complex distributed applications much easier and make the resulting applications scalable by design.--->
 Orleans是一个改进的actor模型的实现，大量参考了Erlang和分布式对象系统，添加了静态类型、消息中间层和actor虚拟化，将这些集成在一个编程模型中。尽管Erlang是一个有它自己的自定义虚拟机纯函数式语言,Orleans编程模型还是直接利用.NET和它的面向对象的能力。它提供了一个让开发复杂分布式应用更简单的平台，并且使最终的应用在设计上具有可扩展性。
