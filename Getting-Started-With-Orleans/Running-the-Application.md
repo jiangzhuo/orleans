@@ -22,9 +22,9 @@ title: Running the Application
 <!--To establish a connection, a client calls `GrainClient.Initialize()`.-->
 客户端调用`GrainClient.Initialize()`建立一个连接。
 <!--This will connect to the gateway silo at the IP address and port specified in the _ClientConfiguration.xml_ file.-->
-这会连接到_ClientConfiguration.xml_文件中指定的IP地址和端口的网关silo。
+这会连接到 _ClientConfiguration.xml_ 文件中指定的IP地址和端口的网关silo。
 <!--This file must be placed in the same directory as the _Orleans.dll_ library used by the client.-->
-这个文件必须与客户端使用的_Orleans.dll_放在相同目录。
+这个文件必须与客户端使用的 _Orleans.dll_ 放在相同目录。
 <!--As an alternative, a configuration object can be passed to `GrainClient.Initialize()` programmatically instead of loading it from a file.-->
 一个替代方案是，可以以编程的方式传递一个配置对象给`GrainClient.Initialize()`而不是从文件读取。
 
