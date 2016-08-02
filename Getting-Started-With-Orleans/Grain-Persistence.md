@@ -4,29 +4,44 @@ title: Grain Persistence
 ---
 {% include JB/setup %}
 
-## Grain Persistence Goals
+## grain持久化的目标
+<!--## Grain Persistence Goals-->
 
-1. Allow different grain types to use different types of storage providers (e.g., one uses Azure table, and one uses SQL Azure) or the same type of storage provider but with different configurations (e.g., both use Azure table, but one uses storage account #1 and one uses storage account #2)
-2. Allow configuration of a storage provider instance to be swapped (e.g., Dev-Test-Prod) with just config file changes, and no code changes required.
-3. Provide a framework to allow additional storage providers to be written later, either by the Orleans team or others.
-4. Provide a minimal set of production-grade storage providers
-5. Storage providers have complete control over how they store grain state data in persistent backing store. Corollary: Orleans is not providing a comprehensive ORM storage solution, but allows custom storage providers to support specific ORM requirements as and when required.
+<!--1. Allow different grain types to use different types of storage providers (e.g., one uses Azure table, and one uses SQL Azure) or the same type of storage provider but with different configurations (e.g., both use Azure table, but one uses storage account #1 and one uses storage account #2)-->
+<!--2. Allow configuration of a storage provider instance to be swapped (e.g., Dev-Test-Prod) with just config file changes, and no code changes required.-->
+<!--3. Provide a framework to allow additional storage providers to be written later, either by the Orleans team or others.-->
+<!--4. Provide a minimal set of production-grade storage providers-->
+<!--5. Storage providers have complete control over how they store grain state data in persistent backing store. Corollary: Orleans is not providing a comprehensive ORM storage solution, but allows custom storage providers to support specific ORM requirements as and when required.-->
+1. 允许不同的grain类型使用不同的存储（例如，一个使用Azure table，一个使用SQL Azure）或者同样类型的存储但是使用不同的配置（例如，都使用Azure table但是一个使用存储帐号＃1，一个使用存储帐号＃2）
+2. 允许仅仅改变配置文件而不改变代码来实现一个存储提供者的配置转换（例如，开发－测试－生产之间转换）。
+3. 提供一个框架来允许添加之后编写的额外的存储提供者，不管是Orleans团队编写的还是其他人编写的。
+4. 提供一小部分生产级别的存储提供者。
+5. 存储提供者对于如何在持久化后段存储存储grain的状态有完全的控制权。结论是：Orleans不提供全面的ORM解决方案，但是当有需要 时允许定制存储提供者来支持特定的ORM需求。
 
-## Grain Persistence API
+## grain持久化API
+<!--## Grain Persistence API-->
 
-Grain types can be declared in one of two ways:
+<!--Grain types can be declared in one of two ways:-->
+grain类型可以用一下其中一种方式声明：
 
-* Extend `Grain` if they do not have any persistent state, or if they will handle all persistent state themselves, or
-* Extend `Grain<T>` if they have some persistent state that they want the Orleans runtime to handle.
-Stated another way, by extending `Grain<T>` a grain type is automatically opted-in to the Orleans system managed persistence framework.
+<!--* Extend `Grain` if they do not have any persistent state, or if they will handle all persistent state themselves, or-->
+<!--* Extend `Grain<T>` if they have some persistent state that they want the Orleans runtime to handle.-->
+<!--Stated another way, by extending `Grain<T>` a grain type is automatically opted-in to the Orleans system managed persistence framework.-->
+* 扩展`Grain`，如果他们没有任何持久化的状态或者他们自己能够处理所有持久化的状态，或者
+* 扩展`Grain<T>`，如果他们有想要Orleans运行处理的持久化的状态。
+换句话说，使用扩展`Grain<T>`的方式声明grain类型就是自动选择了Orleans系统管理的持久化框架。
 
-For the remainder of this section, we will only be considering Option #2 / `Grain<T>` because Option #1 grains will continue to run as now without any behavior changes.
+<!--For the remainder of this section, we will only be considering Option #2 / `Grain<T>` because Option #1 grains will continue to run as now without any behavior changes.-->
+这节其余的部分，我们只考虑第二种情况`Grain<T>`，因为第一种情况grain会继续运行不会有任何的行为变化。
 
-## Grain State Stores
+## grain状态存储
+<!--## Grain State Stores-->
 
-Grain classes that inherit from `Grain<T>` (where `T` is an application-specific state data type derived from `GrainState`) will have their state loaded automatically from a specified storage.
+<!--Grain classes that inherit from `Grain<T>` (where `T` is an application-specific state data type derived from `GrainState`) will have their state loaded automatically from a specified storage.-->
+继承自`Grain<T>`（T是一个派生自`GrainState`的应用相关的状态数据）的grain类将会村特定的存储中自动地加载他们的状态。
 
-Grains will be marked with a `[StorageProvider]` attribute that specifies a named instance of a storage provider to use for reading / writing the state data for this grain.
+<!--Grains will be marked with a `[StorageProvider]` attribute that specifies a named instance of a storage provider to use for reading / writing the state data for this grain.-->
+grain将会被一个指定了存储提供者命名实例的`[StorageProvider]`特性所标记，用来为grain读取／写入状态数据。
 
 ``` csharp
 [StorageProvider(ProviderName="store1")]
@@ -36,7 +51,8 @@ public class MyGrain<MyGrainState> ...
 }
 ```
 
-The Orleans Provider Manager framework provides a mechanism to specify & register different storage providers and storage options in the silo config file.
+<!--The Orleans Provider Manager framework provides a mechanism to specify & register different storage providers and storage options in the silo config file.-->
+Orleans提供者管理框架提供了一个指定&注册不同存储提供者的机制并且把选项存储silo的配置文件中。
 
 ```xml
 <OrleansConfiguration xmlns="urn:orleans">
@@ -50,39 +66,55 @@ The Orleans Provider Manager framework provides a mechanism to specify & registe
     </StorageProviders>
 ```
 
-## Configuring Storage Providers
+## 配置存储提供者
+<!--## Configuring Storage Providers-->
 
 ### AzureTableStorage
+<!--### AzureTableStorage-->
 
 ```xml
 <Provider Type="Orleans.Storage.AzureTableStorage" Name="TableStore"
     DataConnectionString="UseDevelopmentStorage=true" />
 ```
 
-The following attributes can be added to the `<Provider />` element to configure the provider:
+<!--The following attributes can be added to the `<Provider />` element to configure the provider:-->
+下面的特性可以被添加到`<Provider />`元素中来配置提供者：
 
-* __`DataConnectionString="..."`__ (mandatory) - The Azure storage connection string to use
-* __`TableName="OrleansGrainState"`__ (optional) - The table name to use in table storage, defaults to `OrleansGrainState`
-* __`DeleteStateOnClear="false"`__ (optional) - If true, the record will be deleted when grain state is cleared, otherwise an null record will be written, defaults to `false`
-* __`UseJsonFormat="false"`__ (optional) - If true, the json serializer will be used, otherwise the Orleans binary serializer will be used, defaults to `false`
-* __`UseFullAssemblyNames="false"`__ (optional) - (if `UseJsonFormat="true"`) Serializes types with full assembly names (true) or simple (false), defaults to `false`
-* __`IndentJSON="false"`__ (optional) - (if `UseJsonFormat="true"`) Indents the serialized json, defaults to `false`
+<!--* __`DataConnectionString="..."`__ (mandatory) - The Azure storage connection string to use-->
+<!--* __`TableName="OrleansGrainState"`__ (optional) - The table name to use in table storage, defaults to `OrleansGrainState`-->
+<!--* __`DeleteStateOnClear="false"`__ (optional) - If true, the record will be deleted when grain state is cleared, otherwise an null record will be written, defaults to `false`-->
+<!--* __`UseJsonFormat="false"`__ (optional) - If true, the json serializer will be used, otherwise the Orleans binary serializer will be used, defaults to `false`-->
+<!--* __`UseFullAssemblyNames="false"`__ (optional) - (if `UseJsonFormat="true"`) Serializes types with full assembly names (true) or simple (false), defaults to `false`-->
+<!--* __`IndentJSON="false"`__ (optional) - (if `UseJsonFormat="true"`) Indents the serialized json, defaults to `false`-->
+* __`DataConnectionString="..."`__ （必选） － Azure storage的连接字符串
+* __`TableName="OrleansGrainState"`__ （可选） － 表存储用的表名，默认是`OrleansGrainState`
+* __`DeleteStateOnClear="false"`__ （可选） － 如果是true，在清除的时候记录会被删除，否则会写入一条null数据，默认是`false`
+* __`UseJsonFormat="false"`__ （可选） － 如果是true，将使用json序列化，否则将会使用Orleans二进制序列化，默人是`false`
+* __`UseFullAssemblyNames="false"`__ （可选） － （如果`UseJsonFormat="true"`） 序列化的类型带有完整的程序集名字（true）或者简单的名字（false）, 默认是`false`
+* __`IndentJSON="false"`__ （可选） － （如果`UseJsonFormat="true"`） 缩紧序列化后的json，默人是`false`
 
-> __Note:__ state should not exceed 64KB, a limit imposed by Table Storage.
+<!--> __Note:__ state should not exceed 64KB, a limit imposed by Table Storage.-->
+> __注意：__ 状态不要超出64KB，Azure Table Storage的强制限制。
 
 ### AzureBlobStorage
+<!--### AzureBlobStorage-->
 
 ```xml
 <Provider Type="Orleans.Storage.AzureTableStorage" Name="BlobStore"
     DataConnectionString="UseDevelopmentStorage=true" />
 ```
 
-The following attributes can be added to the `<Provider />` element to configure the provider:
+<!--The following attributes can be added to the `<Provider />` element to configure the provider:-->
+下面的特性可以被添加到`<Provider />`元素中来配置提供者：
 
-* __`DataConnectionString="..."`__ (mandatory) - The Azure storage connection string to use
-* __`ContainerName="grainstate"`__ (optional) - The blob storage container to use, defaults to `grainstate`
-* __`UseFullAssemblyNames="false"`__ (optional) - Serializes types with full assembly names (true) or simple (false), defaults to `false`
-* __`IndentJSON="false"`__ (optional) - Indents the serialized json, defaults to `false`
+<!--* __`DataConnectionString="..."`__ (mandatory) - The Azure storage connection string to use-->
+<!--* __`ContainerName="grainstate"`__ (optional) - The blob storage container to use, defaults to `grainstate`-->
+<!--* __`UseFullAssemblyNames="false"`__ (optional) - Serializes types with full assembly names (true) or simple (false), defaults to `false`-->
+<!--* __`IndentJSON="false"`__ (optional) - Indents the serialized json, defaults to `false`-->
+* __`DataConnectionString="..."`__ (必选) - Azure storage的连接字符串
+* __`ContainerName="grainstate"`__ (可选) - 使用的blob storage container，默认是`grainstate`
+* __`UseFullAssemblyNames="false"`__ (可选) - 序列化的类型带有完整的程序集名字（true）或者简单的名字（false）, 默认是`false`
+* __`IndentJSON="false"`__ (可选) - 序列化后的json包含锁进，默认是`false`
 
 <!--
 ### SqlStorageProvider
@@ -103,9 +135,11 @@ The following attributes can be added to the `<Provider />` element to configure
 ```xml
 <Provider Type="Orleans.Storage.MemoryStorage" Name="MemoryStorage"  />
 ```
-> __Note:__ This provider persists state to volatile memory which is erased at silo shut down. Use only for testing.
+<!--> __Note:__ This provider persists state to volatile memory which is erased at silo shut down. Use only for testing.-->
+> __注意：__ 这个提供者将状态持久化到独立内存中，在silo关闭的时候将被清除。只用来测试用。
 
-* __`NumStorageGrains="10"`__ (optional) - The number of grains to use to store the state, defaults to `10`
+<!--* __`NumStorageGrains="10"`__ (optional) - The number of grains to use to store the state, defaults to `10`-->
+* __`NumStorageGrains="10"`__ (可选) - 用来存储状态的grain的个数，默认是`10`
 
 ### ShardedStorageProvider
 
@@ -117,7 +151,6 @@ The following attributes can be added to the `<Provider />` element to configure
 </Provider>
 ```
 Simple storage provider for writing grain state data shared across a number of other storage providers.
-
 A consistent hash function (default is Jenkins Hash) is used to decide which
 shard (in the order they are defined in the config file) is responsible for storing
 state data for a specified grain, then the Read / Write / Clear request
