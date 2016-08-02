@@ -150,40 +150,59 @@ Orleans提供者管理框架提供了一个指定&注册不同存储提供者的
     <Provider />
 </Provider>
 ```
-Simple storage provider for writing grain state data shared across a number of other storage providers.
-A consistent hash function (default is Jenkins Hash) is used to decide which
-shard (in the order they are defined in the config file) is responsible for storing
-state data for a specified grain, then the Read / Write / Clear request
-is bridged over to the appropriate underlying provider for execution.
+<!--Simple storage provider for writing grain state data shared across a number of other storage providers.-->
+一个简单的写入分片到若干存储提供者的数据的简单存储提供者。
+<!--A consistent hash function (default is Jenkins Hash) is used to decide which-->
+<!--shard (in the order they are defined in the config file) is responsible for storing-->
+<!--state data for a specified grain, then the Read / Write / Clear request-->
+<!--is bridged over to the appropriate underlying provider for execution.-->
+使用一个一致性哈希函数（默认是Jenkins Hash）来决定哪个分片对指定的grain的状态数据存储进行相应，然后读取/写入/清除请求路由到适当的潜在的提供者来执行。
 
-## Notes on Storage Providers
+## 关于存储提供者特别说明的
+<!--## Notes on Storage Providers-->
 
-If there is no `[StorageProvider]` attribute specified for a `Grain<T>` grain class, then a provider named `Default` will be searched for instead.
-If not found then this is treated as a missing storage provider.
+<!--If there is no `[StorageProvider]` attribute specified for a `Grain<T>` grain class, then a provider named `Default` will be searched for instead.-->
+如果没有给一个`Grain<T>`grain类指定`[StorageProvider]`特性，将会搜索使用名为`Default`的提供者。
+<!--If not found then this is treated as a missing storage provider.-->
+如果没有找到，就当作缺少存储提供者。
 
-If there is only one provider in the silo config file, it will be considered to be the `Default` provider for this silo.
+<!--If there is only one provider in the silo config file, it will be considered to be the `Default` provider for this silo.-->
+如果silo配置文件中只有一个提供者，它会被当作silo的`Default`提供者。
 
-A grain that uses a storage provider which is not present and defined in the silo configuration when the silo loads will fail to load, but the rest of the grains in that silo can still load and run.
-Any later calls to that grain type will fail with an `Orleans.Storage.BadProviderConfigException` error specifying that the grain type is not loaded.
+<!--A grain that uses a storage provider which is not present and defined in the silo configuration when the silo loads will fail to load, but the rest of the grains in that silo can still load and run.-->
+一个使用不存在或者没有在silo配置中定义的提供者的grain将会在加载的时候失败，但是其他的grain还是会加载并且运行。
+<!--Any later calls to that grain type will fail with an `Orleans.Storage.BadProviderConfigException` error specifying that the grain type is not loaded.-->
+之后任何对这个grain的调用都会失败得到一个表示那个grain类型没有被加载的`Orleans.Storage.BadProviderConfigException`错误。
 
-The storage provider instance to use for a given grain type is determined by the combination of the storage provider name defined in the `[StorageProvider]` attribute on that grain type, plus the provider type and configuration options for that provider defined in the silo config.
+<!--The storage provider instance to use for a given grain type is determined by the combination of the storage provider name defined in the `[StorageProvider]` attribute on that grain type, plus the provider type and configuration options for that provider defined in the silo config.-->
+一个grain类型最终使用的存储提供者是通过`[StorageProvider]`特性中的提供者名称加上提供者的类型和silo配置中定义的提供者配置选项决定。
 
-Different grain types can use different configured storage providers, even if both are the same type: for example, two different Azure table storage provider instances, connected to different Azure storage accounts (see config file example above).
+<!--Different grain types can use different configured storage providers, even if both are the same type: for example, two different Azure table storage provider instances, connected to different Azure storage accounts (see config file example above).-->
+不同的grain类型使用不同配置的存储提供者，即使是同一个类型：例如，两个不同的Azure table存储提供者实例，连接到不同的Azure storge account（参考上面的配置文件例子）。
 
-All configuration details for storage providers is defined statically in the silo configuration that is read at silo startup.
-There are _no_ mechanisms provided at this time to dynamically update or change the list of storage providers used by a silo.
-However, this is a prioritization / workload constraint rather than a fundamental design constraint.
+<!--All configuration details for storage providers is defined statically in the silo configuration that is read at silo startup.-->
+所有的存储提供者的配置细节静态地卸载silo配置中在silo启动时读取。
+<!--There are _no_ mechanisms provided at this time to dynamically update or change the list of storage providers used by a silo.-->
+现在 _没有_ 动态地更新或者改变silo的使用的存储提供者的机制。
+<!--However, this is a prioritization / workload constraint rather than a fundamental design constraint.-->
+然而，这是一个优先级/工作量限制，而不是一个基本的设计约束。
 
-## State Storage APIs
+## 状态存储API
+<!--## State Storage APIs-->
 
-There are two main parts to the grain state / persistence APIs: Grain-to-Runtime and Runtime-to-Storage-Provider.
+<!--There are two main parts to the grain state / persistence APIs: Grain-to-Runtime and Runtime-to-Storage-Provider.-->
+grain状态/持久化API有两个部分：Grain到与形时和运行时到存储提供者。
 
-## Grain State Storage API
+## grain状态存储API
+<!--## Grain State Storage API-->
 
-The grain state storage functionality in the Orleans Runtime will provide read and write operations to automatically populate / save the `GrainState` data object for that grain.
-Under the covers, these functions will be connected (within the code generated by Orleans client-gen tool) through to the appropriate persistence provider configured for that grain.
+<!--The grain state storage functionality in the Orleans Runtime will provide read and write operations to automatically populate / save the `GrainState` data object for that grain.-->
+Orleans运行时的状态存储功能提供读取和写入操作来自动的填充/保存grain的`GrainState`数据对象。
+<!--Under the covers, these functions will be connected (within the code generated by Orleans client-gen tool) through to the appropriate persistence provider configured for that grain.-->
+这些功能将会通过为grain配置的恰当的持久化提供者来默默地完成。
 
-## Grain State Read / Write Functions
+## grain状态读写函数
+<!--## Grain State Read / Write Functions-->
 
 Grain state will automatically be read when the grain is activated, but grains are responsible for explicitly triggering the write for any changed grain state as and when necessary.
 See the [Failure Modes](#FailureModes) section below for details of error handling mechanisms.
