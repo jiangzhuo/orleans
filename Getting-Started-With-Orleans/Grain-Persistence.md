@@ -204,24 +204,37 @@ Orleans运行时的状态存储功能提供读取和写入操作来自动的填�
 ## grain状态读写函数
 <!--## Grain State Read / Write Functions-->
 
-Grain state will automatically be read when the grain is activated, but grains are responsible for explicitly triggering the write for any changed grain state as and when necessary.
-See the [Failure Modes](#FailureModes) section below for details of error handling mechanisms.
+<!--Grain state will automatically be read when the grain is activated, but grains are responsible for explicitly triggering the write for any changed grain state as and when necessary.-->
+当grain激活的时候grain状态会自动被读取，但是当需要的时候grain需要显示地触发任何grain状态的写操作。
+<!--See the [Failure Modes](#FailureModes) section below for details of error handling mechanisms.-->
+阅读[失败模式](#FailureModes)一节，了解更多错误处理机制的细节。
 
-`GrainState` will be read automatically (using the equivalent of `base.ReadStateAsync()`) _before_ the `OnActivateAsync()` method is called for that activation.
-`GrainState` will not be refreshed before any method calls to that grain, unless the grain was activated for this call.
+<!--`GrainState` will be read automatically (using the equivalent of `base.ReadStateAsync()`) _before_ the `OnActivateAsync()` method is called for that activation.-->
+激活的时候，`GrainState`(等同于`base.ReadStateAsync()`)在`OnActivateAsync()`方法被调用之前会被调用。
+<!--`GrainState` will not be refreshed before any method calls to that grain, unless the grain was activated for this call.-->
+`GrainState`在grain的任何方法被调用之前不会更新，除非这次调用的时候这个grain已经激活了。
 
-During any grain method call, a grain can request the Orleans runtime to write the current grain state data for that activation to the designated storage provider by calling `base.WriteStateAsync()`.
-The grain is responsible for explicitly performing write operations when they make significant updates to their state data.
-Most commonly, the grain method will return the `base.WriteStateAsync()` `Task` as the final result `Task` returned from that grain method, but it is not required to follow this pattern.
-The runtime will not automatically update stored grain state after any grain methods.
+<!--During any grain method call, a grain can request the Orleans runtime to write the current grain state data for that activation to the designated storage provider by calling `base.WriteStateAsync()`.-->
+在grain的任何方法被调用的时候，一个grain可以要求Orleans运行时把那个激活的当前的状态数据通过调用`base.WriteStateAsync()`写入到指定的存储提供者中。
+<!--The grain is responsible for explicitly performing write operations when they make significant updates to their state data.-->
+当grain状态数据发生显著的更新的时候，grain负责显示地执行写入操作。
+<!--Most commonly, the grain method will return the `base.WriteStateAsync()` `Task` as the final result `Task` returned from that grain method, but it is not required to follow this pattern.-->
+大多说情况下，grain方法返回`base.WriteStateAsync()` `Task`作为最终结果`Task`返回，但是它并不要求遵循此模式。
+<!--The runtime will not automatically update stored grain state after any grain methods.-->
+运行时在任何grain方法后不会自动更新存储的grain。
 
-During any grain method or timer callback handler in the grain, the grain can request the Orleans runtime to re-read the current grain state data for that activation from the designated storage provider by calling `base.ReadStateAsync()`.
-This will completely overwrite any current state data currently stored in the grain state object with the latest values read from persistent store.
+<!--During any grain method or timer callback handler in the grain, the grain can request the Orleans runtime to re-read the current grain state data for that activation from the designated storage provider by calling `base.ReadStateAsync()`.-->
+在任何grain方法或者timer回掉函数中，grain可以要求Orleans运行时通过调用`base.ReadStateAsync()`从指定的存储提供者重读当前的grain激活的状态数据。
+<!--This will completely overwrite any current state data currently stored in the grain state object with the latest values read from persistent store.-->
+这将会使用从持久化存储中读出的最新值完全重写当前grain状态对象中存储的状态数据。
 
-An opaque provider-specific `Etag` value (`string`) _may_ be set by a storage provider as part of the grain state metadata populated when state was read.
-Some providers may choose to leave this as `null` if they do not use `Etag`s.
+<!--An opaque provider-specific `Etag` value (`string`) _may_ be set by a storage provider as part of the grain state metadata populated when state was read.-->
+当状态读取时存储提供者 _可能_ 将一个不透明的提供者指定的`Etag`值(`string`)作为grain状态数据的一部分填充进去。
+<!--Some providers may choose to leave this as `null` if they do not use `Etag`s.-->
+一些不适用`Etag`的提供者会选择将这个值留作`null`。
 
-Conceptually, the Orleans Runtime will take a deep copy of the grain state data object for its own use during any write operations. Under the covers, the runtime _may_ use optimization rules and heuristics to avoid performing some or all of the deep copy in some circumstances, provided that the expected logical isolation semantics are preserved.
+<!--Conceptually, the Orleans Runtime will take a deep copy of the grain state data object for its own use during any write operations. Under the covers, the runtime _may_ use optimization rules and heuristics to avoid performing some or all of the deep copy in some circumstances, provided that the expected logical isolation semantics are preserved.-->
+概念上，Orleans运行在任何写操作的时候时会对grain状态数据对象进行深拷贝为自己使用。表面之下，运行时在一些环境中 _可能_ 使用优化策略和启发式方法来避免进行一些或者全部的深拷贝，通过这个能实现期望的逻辑隔离语义。
 
 ## Sample Code for Grain State Read / Write Operations
 
@@ -244,15 +257,21 @@ public class MyPersistenceGrain : Grain<MyGrainState>, IMyPersistenceGrain
 }
 ```
 
-## Grain State Read
+## grain状态读取
+<!--## Grain State Read-->
 
-The initial read of the grain state will occur automatically by the Orleans runtime before the grain’s `OnActivateAsync()` method is called; no application code is required to make this happen.
-From that point forward, the grain’s state will be available through the `Grain<T>.State` property inside the grain class.
+<!--The initial read of the grain state will occur automatically by the Orleans runtime before the grain’s `OnActivateAsync()` method is called; no application code is required to make this happen.-->
+最初的grain状态读取将会有Orleans运行在grain的`OnActivateAsync()`方法调用前自动发生；不需要使用应用代码来触发。
+<!--From that point forward, the grain’s state will be available through the `Grain<T>.State` property inside the grain class.-->
+此后，可以通过grain类中的`Grain<T>.State`属性来读取grain的状态。
 
-## Grain State Write
+## grain状态写入
+<!--## Grain State Write-->
 
-After making any appropriate changes to the grain’s in-memory state, the grain should call the `base.WriteStateAsync()` method to write the changes to the persistent store via the defined storage provider for this grain type.
-This method is asynchronous and returns a `Task` that will typically be returned by the grain method as its own completion Task.
+<!--After making any appropriate changes to the grain’s in-memory state, the grain should call the `base.WriteStateAsync()` method to write the changes to the persistent store via the defined storage provider for this grain type.-->
+在对grain的内存中的状态进行任何适当改动后，grain应该调用`base.WriteStateAsync()`方法通过已经grain类型已经定义的存储提供者将改变写入到持久化存储。
+<!--This method is asynchronous and returns a `Task` that will typically be returned by the grain method as its own completion Task.-->
+这个方法是异步的并且返回一个`Task`。这个`Task`通常作为grain方法它自己的完成Task返回。
 
 
 ``` csharp
@@ -263,10 +282,13 @@ public Task DoWrite(int val)
 }
 ```
 
-## Grain State Refresh
+## grain状态刷新
+<!--## Grain State Refresh-->
 
-If a grain wishes to explicitly re-read the latest state for this grain from backing store, the grain should call the `base.ReadStateAsync()` method.
-This will reload the grain state from persistent store, via the defined storage provider for this grain type, and any previous in-memory copy of the grain state will be overwritten and replaced when the `ReadStateAsync()` `Task` completes.
+<!--If a grain wishes to explicitly re-read the latest state for this grain from backing store, the grain should call the `base.ReadStateAsync()` method.-->
+如果一个grain希望显示地从后存储中重新读取这个grain的最新状态，这个grain应该调用`base.ReadStateAsync()`方法。
+<!--This will reload the grain state from persistent store, via the defined storage provider for this grain type, and any previous in-memory copy of the grain state will be overwritten and replaced when the `ReadStateAsync()` `Task` completes.-->
+这将通过已为这个grain定义的存储提供者从持久化存储中重新加载grain状态，并且当`ReadStateAsync()` `Task`完成时。任何之前内存中的grain状态的拷贝会被重写和替换，
 
 ``` csharp
 public async Task<int> DoRead()
