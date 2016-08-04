@@ -298,30 +298,45 @@ public async Task<int> DoRead()
 }
 ```
 
-## Failure Modes for Grain State Persistence Operations <a name="FailureModes"></a>
+## grain持久化操作的失败模式
+<!--## Failure Modes for Grain State Persistence Operations <a name="FailureModes"></a>-->
 
-### Failure Modes for Grain State Read Operations
+### grain状态读取操作的失败模式
+<!--### Failure Modes for Grain State Read Operations-->
 
-Failures returned by the storage provider during the initial read of state data for that particular grain will result in the activate operation for that grain to be failed; in this case, there will _not_ be any call to that grain’s `OnActivateAsync()` life cycle callback method.
-The original request to that grain which caused the activation will be faulted back to the caller the same way as any other failure during grain activation.
-Failures encountered by the storage provider to read state data for a particular grain will result in the `ReadStateAsync()` `Task` to be faulted.
-The grain can choose to handle or ignore that faulted `Task`, just like any other `Task` in Orleans.
+<!--Failures returned by the storage provider during the initial read of state data for that particular grain will result in the activate operation for that grain to be failed; in this case, there will _not_ be any call to that grain’s `OnActivateAsync()` life cycle callback method.-->
+存储提供者返回的在初始化读取特定grain的状态数据时的失败将会导致那个grain的激活操作失败；这样的话，那个grain的`OnActivateAsync()`生命周期的回掉方法将 _不会_ 被调用。
+<!--The original request to that grain which caused the activation will be faulted back to the caller the same way as any other failure during grain activation.-->
+引起那个grain激活的原始请求也会失败，想其他grain激活期间的失败一样返回给调用者。
+<!--Failures encountered by the storage provider to read state data for a particular grain will result in the `ReadStateAsync()` `Task` to be faulted.-->
+特定的grain的存储提供者读取状态数据遇到的失败将会导致`ReadStateAsync()` `Task`失败。
+<!--The grain can choose to handle or ignore that faulted `Task`, just like any other `Task` in Orleans.-->
+grain可以选择处理或者忽略这个失败`Task`，就像Orleans中其他的`Task`一样。
 
-Any attempt to send a message to a grain which failed to load at silo startup time due to a missing / bad storage provider config will return the permanent error `Orleans.BadProviderConfigException`.
+<!--Any attempt to send a message to a grain which failed to load at silo startup time due to a missing / bad storage provider config will return the permanent error `Orleans.BadProviderConfigException`.-->
+任何向silo启动时因缺少/错误的存贮提供者配置而不能加载的grain发送消息的尝试都将返回一个永久错误`Orleans.BadProviderConfigException`。
 
-### Failure Modes for Grain State Write Operations
+### grain状态写入操作的失败模式
+<!--### Failure Modes for Grain State Write Operations-->
 
-Failures encountered by the storage provider to write state data for a particular grain will result in the `WriteStateAsync()` `Task` to be faulted.
-Usually, this will mean the grain call will be faulted back to the client caller provided the `WriteStateAsync()` `Task` is correctly chained in to the final return `Task` for this grain method.
-However, it will be possible for certain advanced scenarios to write grain code to specifically handle such write errors, just like they can handle any other faulted `Task`.
+<!--Failures encountered by the storage provider to write state data for a particular grain will result in the `WriteStateAsync()` `Task` to be faulted.-->
+特定的grain的存储提供者写入状态数据遇到的失败会导致`WriteStateAsync()` `Task`失败。
+<!--Usually, this will mean the grain call will be faulted back to the client caller provided the `WriteStateAsync()` `Task` is correctly chained in to the final return `Task` for this grain method.-->
+通常，这代表grain调用将会传递给提供了`WriteStateAsync()` `Task`的客户端调用者，并且作为grain方法最终返回的`Task`.
+<!--However, it will be possible for certain advanced scenarios to write grain code to specifically handle such write errors, just like they can handle any other faulted `Task`.-->
+然而，也可能在确定的高级场景中来编写grain代码特别处理这样的写入错误，就像能处理其他失败的`Task`一样。
 
-Grains that execute error-handling / recovery code _must_ catch exceptions / faulted `WriteStateAsync()` `Task`s and not re-throw to signify that they have successfully handled the write error.
+<!--Grains that execute error-handling / recovery code _must_ catch exceptions / faulted `WriteStateAsync()` `Task`s and not re-throw to signify that they have successfully handled the write error.-->
+执行错误处理/回复的grain代码 _必须_ 捕获`WriteStateAsync()` `Task`的异常/失败比去年给不重新抛出，表明已经成功处理了错误。
 
-## Storage Provider Framework
+## 存储提供者框架
+<!--## Storage Provider Framework-->
 
-There is a service provider API for writing additional persistence providers – `IStorageProvider`.
+<!--There is a service provider API for writing additional persistence providers – `IStorageProvider`.-->
+有一个服务提供者API来写额外的持久化存储提供者 – `IStorageProvider`。
 
-The Persistence Provider API covers read and write operations for GrainState data.
+<!--The Persistence Provider API covers read and write operations for GrainState data.-->
+持久化提供者API包括对grain状态数据的读取和写入操作。
 
 ``` csharp
 public interface IStorageProvider
@@ -335,9 +350,11 @@ public interface IStorageProvider
 }
 ```
 
-## Storage Provider Semantics
+## 存储提供者语义
+<!--## Storage Provider Semantics-->
 
-Any attempt to perform a write operation when the storage provider detects an `Etag` constraint violation _should_ cause the write `Task` to be faulted with transient error `Orleans.InconsistentStateException` and wrapping the underlying storage exception.
+<!--Any attempt to perform a write operation when the storage provider detects an `Etag` constraint violation _should_ cause the write `Task` to be faulted with transient error `Orleans.InconsistentStateException` and wrapping the underlying storage exception.-->
+当进行任何写操作的时候存储提供者检测到`Etag`违反约束，就 _应该_ 以一个瞬时错误 `Orleans.InconsistentStateException`引发写`Task`失败并且包装底层的存储异常。
 
 ``` csharp
 public class InconsistentStateException : AggregateException
@@ -365,10 +382,14 @@ public class InconsistentStateException : AggregateException
 ```
 
 
-Any other failure conditions from a write operation _should_ cause the write `Task` to be broken with an exception containing the underlying storage exception.
+<!--Any other failure conditions from a write operation _should_ cause the write `Task` to be broken with an exception containing the underlying storage exception.-->
+来自写操作的任何其他错误情况 _应该_ 引发写`Task`以一个包含了底层存储异常信息的异常来终止。
 
-## Data Mapping
+## 数据映射
+<!--## Data Mapping-->
 
-Individual storage providers should decide how best to store grain state – blob (various formats / serialized forms) or column-per-field are obvious choices.
+<!--Individual storage providers should decide how best to store grain state – blob (various formats / serialized forms) or column-per-field are obvious choices.-->
+独立的存储提供者应该决定如何存储grain状态 - blob（多种格式/序列化的形式）或者每列一个字段是显而易见的选择。
 
-The basic storage provider for Azure Table encodes state data fields into a single table column using Orleans binary serialization.
+<!--The basic storage provider for Azure Table encodes state data fields into a single table column using Orleans binary serialization.-->
+基本的Azure Table存储提供者将状态数据字段通过Orleans二进制序列化编码成单个表列。
