@@ -154,8 +154,8 @@ protected Task<IOrleansReminder> GetReminder(string reminderName)
 * 当周期性的行为需要不受激活的或者其他错误的影响。
 * 运行不常见的任务（例如：几分钟几小时或者几天是合理的）。
 
-<!--## Combining Timers and Reminders-->
 ## 组合定时器和提醒器
+<!--## Combining Timers and Reminders-->
 
 <!--You might consider using a combination of reminders and timers to accomplish your goal. For example, if you need a timer with a small resolution that needs to survive across activations, you can use a reminder that runs every five minutes, whose purpose is to wake up a grain that restarts a local timer that may have been lost due to a deactivation.-->
 你可能考虑组合使用定时器和提醒器来完成你的目的。例如：如果你需要一个小周期的并且不受激活影响的定时器，你可以使用一个每五分钟运行的提醒器，目的是唤醒一个grain来重启可能在注销时已经丢失的本地定时器。
