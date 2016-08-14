@@ -91,7 +91,7 @@ Orleans提供者管理框架提供了一个指定&注册不同存储提供者的
 * __`DeleteStateOnClear="false"`__ （可选） － 如果是true，在清除的时候记录会被删除，否则会写入一条null数据，默认是`false`
 * __`UseJsonFormat="false"`__ （可选） － 如果是true，将使用json序列化，否则将会使用Orleans二进制序列化，默人是`false`
 * __`UseFullAssemblyNames="false"`__ （可选） － （如果`UseJsonFormat="true"`） 序列化的类型带有完整的程序集名字（true）或者简单的名字（false）, 默认是`false`
-* __`IndentJSON="false"`__ （可选） － （如果`UseJsonFormat="true"`） 缩紧序列化后的json，默人是`false`
+* __`IndentJSON="false"`__ （可选） － （如果`UseJsonFormat="true"`） 缩进序列化后的json，默人是`false`
 
 <!--> __Note:__ state should not exceed 64KB, a limit imposed by Table Storage.-->
 > __注意：__ 状态不要超出64KB，Azure Table Storage的强制限制。
@@ -114,7 +114,32 @@ Orleans提供者管理框架提供了一个指定&注册不同存储提供者的
 * __`DataConnectionString="..."`__ (必选) - Azure storage的连接字符串
 * __`ContainerName="grainstate"`__ (可选) - 使用的blob storage container，默认是`grainstate`
 * __`UseFullAssemblyNames="false"`__ (可选) - 序列化的类型带有完整的程序集名字（true）或者简单的名字（false）, 默认是`false`
-* __`IndentJSON="false"`__ (可选) - 序列化后的json包含锁进，默认是`false`
+* __`IndentJSON="false"`__ (可选) - 序列化后的json包含缩进，默认是`false`
+
+### DynamoDBStorageProvider
+
+```xml
+<Provider Type="Orleans.Storage.DynamoDBStorageProvider" Name="DDBStore"
+    DataConnectionString="Service=us-wes-1;AccessKey=MY_ACCESS_KEY;SecretKey=MY_SECRET_KEY;" />
+```
+
+* __`DataConnectionString="..."`__ (必选) - DynamoDB使用的连接字符串。 你可以设置`Service`,`AccessKey`, `SecretKey`, `ReadCapacityUnits`和`WriteCapacityUnits`。
+* __`TableName="OrleansGrainState"`__ (可选) - 表存储用的表名，默认是`OrleansGrainState`
+* __`DeleteStateOnClear="false"`__ (可选) - 如果是true，在清除的时候记录会被删除，否则会写入一条null数据，默认是`false`
+* __`UseJsonFormat="false"`__ (可选) - 如果是true，将使用json序列化，否则将会使用Orleans二进制序列化，默人是`false`
+* __`UseFullAssemblyNames="false"`__ (可选) - (如果 `UseJsonFormat="true"`) 序列化的类型带有完整的程序集名字（true）或者简单的名字（false）, 默认是`false`
+* __`IndentJSON="false"`__ (可选) - (如果`UseJsonFormat="true"`) 缩进序列化后的json，默人是`false`
+
+<!--
+* __`DataConnectionString="..."`__ (mandatory) - The DynamoDB storage connection string to use. You can set `Service`,`AccessKey`, `SecretKey`, `ReadCapacityUnits` and `WriteCapacityUnits` in it.
+* __`TableName="OrleansGrainState"`__ (optional) - The table name to use in table storage, defaults to `OrleansGrainState`
+* __`DeleteStateOnClear="false"`__ (optional) - If true, the record will be deleted when grain state is cleared, otherwise an null record will be written, defaults to `false`
+* __`UseJsonFormat="false"`__ (optional) - If true, the json serializer will be used, otherwise the Orleans binary serializer will be used, defaults to `false`
+* __`UseFullAssemblyNames="false"`__ (optional) - (if `UseJsonFormat="true"`) Serializes types with full assembly names (true) or simple (false), defaults to `false`
+* __`IndentJSON="false"`__ (optional) - (if `UseJsonFormat="true"`) Indents the serialized json, defaults to `false`
+-->
+
+
 
 <!--
 ### SqlStorageProvider
