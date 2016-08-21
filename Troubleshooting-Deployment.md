@@ -88,4 +88,4 @@ title: Troubleshooting Deployment
 在web和worker role的`diagnostics.wadcfgx`文件中，确保`Logs`中的`scheduledTransferLogLevelFilter`属性设置成`Information`,这是一个用来定义哪些跟踪信息发送到Azure存储的`WADLogsTable`的跟踪过滤的额外层。
 
 <!--You can find more information about this in the [Orleans Configuration Guide] (Orleans-Configuration-Guide/).-->
-你可以在 [Orleans配置向导] (Orleans-Configuration-Guide/)中找到更多信息。
+你可以在 [Orleans配置向导] (Orleans-Configuration-Guide/) 中找到更多信息
