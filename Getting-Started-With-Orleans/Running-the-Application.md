@@ -65,9 +65,5 @@ title: Running the Application
 <!--Back to the [Orleans documentation](../) index-->
 返回[Orleans文档](../)首页
 
-<!--Back to the [Getting Started](./) index-->
-返回[入门](./)首页
-
 <!--Forward to the [Step-by-step Tutorials](../Step-by-step-Tutorials)-->
 转到[手把手教程](../Step-by-step-Tutorials)
-

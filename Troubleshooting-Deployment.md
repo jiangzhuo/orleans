@@ -59,7 +59,7 @@ title: Troubleshooting Deployment
 <!--## Role Keeps Recycling-->
 <!--- Check that all the appropriate Orleans assemblies are in the solution and have Copy Local set to True.-->
 <!--- Check the logs to see if there is an unhandled exception while initializing.-->
-<!--- Make sure that the connections strings are correct.-->
+<!--- Make sure that the connection strings are correct.-->
 <!--- Check the Azure Cloud Services troubleshooting pages for more information.-->
 - 检查确保所有恰当的Orleans程序集在解决方案中并且设置Copy Local为true。
 - 检查log看看是否有初始化过程中没有处理的异常。
